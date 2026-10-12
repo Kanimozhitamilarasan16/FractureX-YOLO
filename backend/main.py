@@ -3,6 +3,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 from io import BytesIO
+import traceback
 
 import cv2
 import numpy as np
@@ -164,8 +165,12 @@ async def predict(file: UploadFile = File(...),
     except FileNotFoundError as exc:
         raise HTTPException(503, str(exc))
     except Exception as exc:
-        raise HTTPException(500, f"Inference failed ({type(exc).__name__}); inspect Render logs for details.")
-
+        print(f"INFERENCE ERROR: {type(exc).__name__}: {exc}", flush=True)
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Inference failed ({type(exc).__name__}): {exc}"
+        )   
 
 if __name__ == "__main__":
     import uvicorn
