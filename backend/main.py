@@ -1,4 +1,5 @@
 """FractureX-YOLO FastAPI inference service; research use only."""
+import __main__
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -95,12 +96,22 @@ def checkpoint_path():
     return Path(os.getenv("MODEL_PATH", str(Path(__file__).resolve().parent.parent / "best.pt")))
 
 
+
 @lru_cache(maxsize=1)
 def load_model():
     path = checkpoint_path()
+
     if not path.is_file():
         raise FileNotFoundError(f"Checkpoint not found: {path}")
-    return YOLO(str(path))
+
+    __main__.DSConv = DSConv
+    __main__.DySnakeConv = DySnakeConv
+    __main__.Bottleneck_DSC = Bottleneck_DSC
+    __main__.C2f_DSC = C2f_DSC
+
+    model = YOLO(str(path))
+    model.to("cpu")
+    return model
 
 
 @app.get("/")
