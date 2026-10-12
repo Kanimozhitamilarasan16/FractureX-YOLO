@@ -1,1 +1,1 @@
-"""FractureX-YOLO backend package."""\n
+"""FractureX-YOLO backend package."""
